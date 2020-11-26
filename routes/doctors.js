@@ -3,6 +3,7 @@ var router = express.Router();
 const jsonwebtoken = require('jsonwebtoken');
 const util = require('util');
 const doctorModel = require('../model/clinicModel');
+const userModel = require('../model/userModel');
 
 const bcrypt = require('bcrypt');
 
@@ -88,7 +89,7 @@ router.get('/get', async (req, res, next)=> {
   }
 
   if(authorization){
-    const user = await doctorModel.findOne({ _id: tokenResult.userId }, { '__v': 0 });
+    const user = await userModel.findOne({ _id: tokenResult.userId }, { '__v': 0 });
     if(user){
       doctorModel.find(function (err, data) {
         if (err) {
