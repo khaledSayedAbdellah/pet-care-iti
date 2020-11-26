@@ -111,13 +111,13 @@ router.patch('/', async (req, res, next)=>{
     if(doctorObj){
       const reservation = await reservationModel.findOne({ _id: req.body.reservationId });
       if(reservation){
-        reservationModel.findByIdAndUpdate(reservaitionId,{"status": req.body.status},
+        reservationModel.findByIdAndUpdate(req.body.reservationId ,{"status": req.body.status},
          function(err, result){
           if(err){
             return res.status(400).json({ status: false, message: "ensure reservationId is valid and rate is valid" });
           }
           else{
-            return res.status(200).json({ status: true, result: result })
+            return res.status(200).json({ status: true, message: "sucsess" })
           }
         })
 
@@ -129,13 +129,13 @@ router.patch('/', async (req, res, next)=>{
       if(userObj){
         const reservation = await reservationModel.findOne({ _id: req.body.reservationId });
       if(reservation){
-        reservationModel.findByIdAndUpdate(reservaitionId,{"rate": req.body.rate},
+        reservationModel.findByIdAndUpdate(req.body.reservationId ,{"rate": req.body.rate},
          function(err, result){
           if(err){
             return res.status(400).json({ status: false, message: "ensure reservationId is valid and rate is valid" });
           }
           else{
-            return res.status(200).json({ status: true, result: result })
+            return res.status(200).json({ status: true, message: "sucsess" })
           }
         })
         //  ><<><><><>><><> database update ><<><><><>><><>
