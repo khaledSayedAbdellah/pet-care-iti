@@ -1,0 +1,174 @@
+var express = require('express');
+var router = express.Router();
+const jsonwebtoken = require('jsonwebtoken');
+const util = require('util');
+const reservationModel = require('../model/reservation');
+const doctorModel = require('../model/clinicModel');
+const userModel = require('../model/userModel');
+
+const bcrypt = require('bcrypt');
+
+const signToken = util.promisify(jsonwebtoken.sign);
+const verifyToken = util.promisify(jsonwebtoken.verify);
+
+constDataFile = require("../constData")
+
+const {secretKey} = constDataFile;
+
+
+
+
+
+router.get('/', async (req, res, next)=> {
+
+  const {authorization} = req.headers;
+  let tokenResult;
+  try{
+    tokenResult = await verifyToken(authorization,secretKey);
+  }catch(e){
+    return res.status(400).json({ status: false, message: "invalid token" });
+  }
+  if(authorization){
+    const doctorObj = await doctorModel.findOne({ _id: tokenResult.userId }, { '__v': 0 });
+    if(doctorObj){
+      reservationModel.find({ doctorId: tokenResult.userId },async (err, data)=> {
+        if (err) {
+          return res.status(400).json({ status: false, message: "error ocurred please try again" });
+        } else{
+          let resultData = [];
+          for(let obj in data){
+            const userObj = await userModel.findOne({ _id: data[obj].userId }, { '_id':0,'password':0,'__v': 0 });
+            if(userObj){
+              resultData.push(
+                {
+                  user: userObj,
+                  status: data[obj].status,
+                  services: data[obj].services,
+                  rate: data[obj].rate,
+                  date: data[obj].date,
+                  id:  data[obj]._id,
+                  AWT: null,
+                }
+              );
+            }
+          }
+          return res.status(200).json({ status: true, data: resultData });
+        }   
+      });
+    }else{
+      return res.status(400).json({ status: false, message: "token not found" });
+    }
+
+  }
+});
+
+
+router.put('/', async (req, res, next)=> {
+
+  const {authorization} = req.headers;
+  let tokenResult;
+  try{
+    tokenResult = await verifyToken(authorization,secretKey);
+  }catch(e){
+    return res.status(400).json({ status: false, message: "invalid token" });
+  }
+  if(authorization){
+    const userObj = await userModel.findOne({ _id: tokenResult.userId }, { '__v': 0 });
+    if(userObj){
+      console.log("router true");
+      
+      req.body.userId = tokenResult.userId;
+      const insertReservationData = reservationModel(req.body);
+
+      insertReservationData.save().
+      then((data) => {
+        res.status(200).send({ status: true, message: "sucsess operation" });
+      }).catch((err) => {
+        res.status(400).send({ status: false, message: err.message });
+      });
+
+      
+    }else{
+      return res.status(400).json({ status: false, message: "token not found" });
+    }
+
+  }
+
+});
+
+//><><><><><> not complete <><><><><><>
+router.patch('/', async (req, res, next)=>{
+  
+  const {authorization} = req.headers;
+  let tokenResult;
+  try{
+    tokenResult = await verifyToken(authorization,secretKey);
+  }catch(e){
+    return res.status(400).json({ status: false, message: "invalid token" });
+  }
+  if(authorization){
+    const doctorObj = await doctorModel.findOne({ _id: tokenResult.userId }, { '__v': 0 });
+    if(doctorObj){
+      const reservation = await reservationModel.findOne({ _id: req.body.reservationId });
+      if(reservation){
+        //  ><<><><><>><><> database update ><<><><><>><><>
+        console("status: "+req.body.status);
+
+      }else{
+        return res.status(400).json({ status: false, message: "reservation id must be valud" });
+      }
+    }else{
+      const userObj = await userModel.findOne({ _id: tokenResult.userId }, { '__v': 0 });
+      if(userObj){
+        const reservation = await reservationModel.findOne({ _id: req.body.reservationId });
+      if(reservation){
+        //  ><<><><><>><><> database update ><<><><><>><><>
+        console("rate: "+req.body.rate);
+
+      }else{
+        return res.status(400).json({ status: false, message: "reservation id must be valud" });
+      }
+      }else{
+        return res.status(400).json({ status: false, message: "token not found" });
+      }
+    }
+
+  }
+});
+
+router.delete('/:id', async (req, res, next)=>{
+  var reservaitionId = req.params.id;
+  if(!reservaitionId){
+    return res.status(400).json({ status: false, message: "reservation id required" });
+  }
+  const {authorization} = req.headers;
+  let tokenResult;
+  try{
+    tokenResult = await verifyToken(authorization,secretKey);
+  }catch(e){
+    return res.status(400).json({ status: false, message: "invalid token" });
+  }
+  if(authorization){
+    const doctorObj = await doctorModel.findOne({ _id: tokenResult.userId }, { '__v': 0 });
+    const userObj = await userModel.findOne({ _id: tokenResult.userId }, { '__v': 0 });
+    if(doctorObj || userObj){
+      const reservation = await reservationModel.findOne({ _id: reservaitionId });
+      if(reservation){
+        //  ><<><><><>><><> database delete ><<><><><>><><>
+        const result = await reservationModel.deleteOne({ _id: reservaitionId });
+        return res.status(400).json({ status: true, message: "reservation delete succsessfuly" });
+      }else{
+        return res.status(400).json({ status: false, message: "reservation id must be valid" });
+      }
+    }else{
+      return res.status(400).json({ status: false, message: "invalid token" });
+    }
+
+  }else{
+    return res.status(400).json({ status: false, message: "token is required in authintication header" });
+  }
+});
+
+
+
+module.exports = router;
