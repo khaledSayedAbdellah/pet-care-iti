@@ -111,8 +111,15 @@ router.patch('/', async (req, res, next)=>{
     if(doctorObj){
       const reservation = await reservationModel.findOne({ _id: req.body.reservationId });
       if(reservation){
-        //  ><<><><><>><><> database update ><<><><><>><><>
-        console("status: "+req.body.status);
+        reservationModel.findByIdAndUpdate(reservaitionId,{"status": req.body.status},
+         function(err, result){
+          if(err){
+            return res.status(400).json({ status: false, message: "ensure reservationId is valid and rate is valid" });
+          }
+          else{
+            return res.status(200).json({ status: true, result: result })
+          }
+        })
 
       }else{
         return res.status(400).json({ status: false, message: "reservation id must be valud" });
@@ -122,6 +129,15 @@ router.patch('/', async (req, res, next)=>{
       if(userObj){
         const reservation = await reservationModel.findOne({ _id: req.body.reservationId });
       if(reservation){
+        reservationModel.findByIdAndUpdate(reservaitionId,{"rate": req.body.rate},
+         function(err, result){
+          if(err){
+            return res.status(400).json({ status: false, message: "ensure reservationId is valid and rate is valid" });
+          }
+          else{
+            return res.status(200).json({ status: true, result: result })
+          }
+        })
         //  ><<><><><>><><> database update ><<><><><>><><>
         console("rate: "+req.body.rate);
 
@@ -135,6 +151,7 @@ router.patch('/', async (req, res, next)=>{
 
   }
 });
+
 
 router.delete('/:id', async (req, res, next)=>{
   var reservaitionId = req.params.id;
