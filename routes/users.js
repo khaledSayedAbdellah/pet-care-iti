@@ -66,7 +66,7 @@ router.post('/login', async (req, res, next) => {
 
         res.status(200).send({ status: true, data: JSON.parse(JSON.stringify(user)),token:token });
       } else {
-        res.status(200).send({ status: false, message: "password not correct" });
+        res.status(400).send({ status: false, message: "password not correct" });
       }
     } catch (e) {
       res.status(500).send({ status: false, message: e.message });
