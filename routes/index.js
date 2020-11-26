@@ -5,7 +5,6 @@ var router = express.Router();
 router.get('/', function(req, res, next) {
   res.status(200).json({
     status: true,
-    code: 200,
     message: "server is running"
   });
 });
