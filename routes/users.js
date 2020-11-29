@@ -14,12 +14,12 @@ constDataFile = require("../constData")
 const {secretKey} = constDataFile;
 
 
-
 router.post('/signup', function (req, res, next) {
+
 
   userModel.findOne({ email: req.body.email }).then(user => {
     if (user) {
-      return res.status(400).json({ email: "email already exists" });
+      return res.status(400).json({status: false, email: "email already exists" });
     } else {
 
       try {

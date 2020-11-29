@@ -33,7 +33,8 @@ router.post('/signup', function (req, res, next) {
 
             insertData.save().
               then((data) => {
-                res.status(200).send({ status: true, message: "sucsess operation" });
+                const token = await signToken({userId: data._id},secretKey);
+                res.status(200).send({ status: true, message: "sucsess operation",token: token});
               }).catch((err) => {
                 res.status(400).send({ status: false, message: err.message });
               });
@@ -80,29 +81,37 @@ router.post('/login', async (req, res, next) => {
 
 router.get('/get', async (req, res, next)=> {
 
-  const {authorization} = req.headers;
-  let tokenResult;
-  try{
-    tokenResult = await verifyToken(authorization,secretKey);
-  }catch(e){
-    return res.status(400).json({ status: false, message: "invalid token" });
-  }
+  doctorModel.find(function (err, data) {
+    if (err) {
+      return res.status(400).json({ status: false, message: "error ocurred please try again" });
+    } else{
+      return res.status(200).json({ status: true, data: data });
+    }   
+  });
 
-  if(authorization){
-    const user = await userModel.findOne({ _id: tokenResult.userId }, { '__v': 0 });
-    if(user){
-      doctorModel.find(function (err, data) {
-        if (err) {
-          return res.status(400).json({ status: false, message: "error ocurred please try again" });
-        } else{
-          return res.status(200).json({ status: true, data: data });
-        }   
-      });
-    }else{
-      return res.status(400).json({ status: false, message: "token not found" });
-    }
+  // const {authorization} = req.headers;
+  // let tokenResult;
+  // try{
+  //   tokenResult = await verifyToken(authorization,secretKey);
+  // }catch(e){
+  //   return res.status(400).json({ status: false, message: "invalid token" });
+  // }
 
-  }
+  // if(authorization){
+  //   const user = await userModel.findOne({ _id: tokenResult.userId }, { '__v': 0 });
+  //   if(user){
+  //     doctorModel.find(function (err, data) {
+  //       if (err) {
+  //         return res.status(400).json({ status: false, message: "error ocurred please try again" });
+  //       } else{
+  //         return res.status(200).json({ status: true, data: data });
+  //       }   
+  //     });
+  //   }else{
+  //     return res.status(400).json({ status: false, message: "token not found" });
+  //   }
+
+  // }
 
     
 
