@@ -83,7 +83,7 @@ router.post('/login', async (req, res, next) => {
 });
 
 
-router.get('/get', async (req, res, next)=> {
+router.get('/', async (req, res, next)=> {
 
   userModel.find({},{password:0,__v:0},function (err, data) {
     if (err) {
@@ -121,7 +121,7 @@ router.get('/get', async (req, res, next)=> {
 });
 
 
-router.get('/get/:id', async (req, res, next)=> {
+router.get('/:id', async (req, res, next)=> {
 
   let id = req.params.id;
 
