@@ -85,36 +85,29 @@ router.post('/login', async (req, res, next) => {
 
 router.get('/', async (req, res, next)=> {
 
-  userModel.find({},{password:0,__v:0},function (err, data) {
-    if (err) {
-      return res.status(400).json({ status: false, message: "error ocurred please try again" });
-    } else{
-      return res.status(200).json({ status: true, data: data });
-    }   
-  });
-  // const {authorization} = req.headers;
-  // let tokenResult;
-  // try{
-  //   tokenResult = await verifyToken(authorization,secretKey);
-  // }catch(e){
-  //   return res.status(400).json({ status: false, message: "invalid token" });
-  // }
+  const {authorization} = req.headers;
+  let tokenResult;
+  try{
+    tokenResult = await verifyToken(authorization,secretKey);
+  }catch(e){
+    return res.status(400).json({ status: false, message: "invalid token" });
+  }
 
-  // if(authorization){
-  //   const user = await userModel.findOne({ _id: tokenResult.userId }, { '__v': 0 });
-  //   if(user){
-  //     userModel.find({},{password:0,__v:0},function (err, data) {
-  //       if (err) {
-  //         return res.status(400).json({ status: false, message: "error ocurred please try again" });
-  //       } else{
-  //         return res.status(200).json({ status: true, data: data });
-  //       }   
-  //     });
-  //   }else{
-  //     return res.status(400).json({ status: false, message: "token not found" });
-  //   }
+  if(authorization){
+    const user = await userModel.findOne({ _id: tokenResult.userId }, { '__v': 0 });
+    if(user){
+      userModel.find({},{password:0,__v:0},function (err, data) {
+        if (err) {
+          return res.status(400).json({ status: false, message: "error ocurred please try again" });
+        } else{
+          return res.status(200).json({ status: true, data: data });
+        }   
+      });
+    }else{
+      return res.status(400).json({ status: false, message: "token not found" });
+    }
 
-  // }
+  }
 
     
 
