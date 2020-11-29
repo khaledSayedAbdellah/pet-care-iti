@@ -9,6 +9,7 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var doctorsRouter = require('./routes/doctors');
 var reervationRouter = require('./routes/reservation');
+var serviceRouter = require('./routes/doctor_services');
 
 
 var app = express();
@@ -23,6 +24,8 @@ app.use('/', indexRouter);
 app.use('/api/users', usersRouter);
 app.use('/api/doctors', doctorsRouter);
 app.use('/api/reservations', reervationRouter);
+app.use('/api/services', serviceRouter);
+
 
 
 
