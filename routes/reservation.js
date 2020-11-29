@@ -17,6 +17,47 @@ const {secretKey} = constDataFile;
 
 
 
+router.get('/:id', async (req, res, next)=> {
+
+  let id = req.params.id;
+
+  const {authorization} = req.headers;
+  let tokenResult;
+  try{
+    tokenResult = await verifyToken(authorization,secretKey);
+  }catch(e){
+    return res.status(400).json({ status: false, message: "invalid token" });
+  }
+  if(authorization){
+    const doctorObjToken = await doctorModel.findOne({ _id: tokenResult.userId }, { '__v': 0 });
+    const userObjToken = await userModel.findOne({ _id: tokenResult.userId }, { '__v': 0 });
+    if(doctorObjToken || userObjToken){
+      reservationModel.findOne({ "_id": id },async (err, data)=> {
+        if (err) {
+          return res.status(400).json({ status: false, message: "error ocurred please try again" });
+        } else{
+          let resultData = {};
+          const userObj = await userModel.findOne({ _id: data.userId }, { '_id':0,'password':0,'__v': 0 });
+          if(userObj){
+            resultData = {
+              user: userObj,
+              status: data.status,
+              services: data.services,
+              rate: data.rate,
+              date: data.date,
+              id:  data._id,
+              AWT: null,
+            };
+          }
+          return res.status(200).json({ status: true, data: resultData });
+        }   
+      });
+    }else{
+      return res.status(400).json({ status: false, message: "token not found" });
+    }
+
+  }
+});
 
 
 router.get('/', async (req, res, next)=> {
@@ -30,8 +71,9 @@ router.get('/', async (req, res, next)=> {
   }
   if(authorization){
     const doctorObj = await doctorModel.findOne({ _id: tokenResult.userId }, { '__v': 0 });
-    if(doctorObj){
-      reservationModel.find({ doctorId: tokenResult.userId },async (err, data)=> {
+    const userObj = await userModel.findOne({ _id: tokenResult.userId }, { '__v': 0 });
+    if(doctorObj || userObj){
+      reservationModel.find(doctorObj?{ doctorId: tokenResult.userId }:{ userId: tokenResult.userId },async (err, data)=> {
         if (err) {
           return res.status(400).json({ status: false, message: "error ocurred please try again" });
         } else{
