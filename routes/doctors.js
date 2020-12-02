@@ -26,12 +26,13 @@ router.post('/signup', function (req, res, next) {
     } else {
 
       try {
-        // let services = [];
-        // for(let index in req.body.services){
-        //   let servicObj = await servicesModel.findOne({"_id": req.body.services[index]});
-        //   services.push(servicObj);
-        // }
-        // req.body = services;
+
+        let services = [];
+        for(let index in req.body.services){
+          let servicObj = await servicesModel.findOne({"_id": req.body.services[index]});
+          services.push(servicObj);
+        }
+        req.body = services;
 
 
         const insertData = doctorModel(req.body);
