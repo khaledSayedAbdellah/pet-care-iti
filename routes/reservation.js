@@ -5,6 +5,7 @@ const util = require('util');
 const reservationModel = require('../model/reservation');
 const doctorModel = require('../model/clinicModel');
 const userModel = require('../model/userModel');
+const servicesModel = require('../model/doctorServices');
 
 const bcrypt = require('bcrypt');
 
@@ -117,9 +118,17 @@ router.put('/', async (req, res, next)=> {
   if(authorization){
     const userObj = await userModel.findOne({ _id: tokenResult.userId }, { '__v': 0 });
     if(userObj){
-      console.log("router true");
       
+      //add user id to body
       req.body.userId = tokenResult.userId;
+      // edit services
+      let services = [];
+        for(let index in req.body.services){
+          let servicObj = await servicesModel.findOne({"_id": req.body.services[index]});
+          services.push(servicObj);
+        }
+        req.body.services = services;
+
       const insertReservationData = reservationModel(req.body);
 
       insertReservationData.save().

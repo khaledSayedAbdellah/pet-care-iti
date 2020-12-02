@@ -20,20 +20,18 @@ const {secretKey} = constDataFile;
 
 router.post('/signup', function (req, res, next) {
 
-  doctorModel.findOne({ email: req.body.email }).then(user => {
+  doctorModel.findOne({ email: req.body.email }).then(async user => {
     if (user) {
       return res.status(400).json({ email: "email already exists" });
     } else {
 
       try {
-
         let services = [];
         for(let index in req.body.services){
           let servicObj = await servicesModel.findOne({"_id": req.body.services[index]});
           services.push(servicObj);
         }
-        req.body = services;
-
+        req.body.services = services;
 
         const insertData = doctorModel(req.body);
 
