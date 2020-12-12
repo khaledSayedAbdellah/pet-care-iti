@@ -6,6 +6,8 @@ const doctorModel = require('../model/clinicModel');
 const userModel = require('../model/userModel');
 const servicesModel = require('../model/doctorServices');
 
+var upload = require('../services/upload');
+
 
 const bcrypt = require('bcrypt');
 
@@ -18,7 +20,7 @@ const {secretKey} = constDataFile;
 
 
 
-router.post('/signup', function (req, res, next) {
+router.post('/signup', upload.single('image'), function (req, res, next) {
 
   doctorModel.findOne({ email: req.body.email }).then(async user => {
     if (user) {
@@ -39,6 +41,8 @@ router.post('/signup', function (req, res, next) {
           bcrypt.hash(insertData.password, salt, (err, hash) => {
             if (err) console.log(req.body.password);
             insertData.password = hash;
+            if(req.file)
+              insertData.image = `/images/${req.file.filename}`
 
             insertData.save().
               then((data) => {
@@ -58,8 +62,6 @@ router.post('/signup', function (req, res, next) {
 
     }
   });
-
-
 });
 
 router.post('/login', async (req, res, next) => {

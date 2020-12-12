@@ -2,6 +2,10 @@
 const mongoose = require('mongoose');
 
 const data = mongoose.model('users',{
+    image: {
+        type: String,
+        default: null
+    },
     name: {
         type: String,
         required: true

@@ -6,6 +6,8 @@ const userModel = require('../model/userModel');
 
 const bcrypt = require('bcrypt');
 
+var upload = require('../services/upload');
+
 const signToken = util.promisify(jsonwebtoken.sign);
 const verifyToken = util.promisify(jsonwebtoken.verify);
 
@@ -14,7 +16,7 @@ constDataFile = require("../constData")
 const {secretKey} = constDataFile;
 
 
-router.post('/signup', function (req, res, next) {
+router.post('/signup',upload.single('image'), function (req, res, next) {
 
 
   userModel.findOne({ email: req.body.email }).then(user => {
@@ -29,6 +31,9 @@ router.post('/signup', function (req, res, next) {
           bcrypt.hash(insertData.password, salt, (err, hash) => {
             if (err) console.log(req.body.password);
             insertData.password = hash;
+            
+            if(req.file)
+            insertData.image = `/images/${req.file.filename}`
 
             insertData.save().
               then((data) => {
@@ -96,7 +101,7 @@ router.get('/', async (req, res, next)=> {
   if(authorization){
     const user = await userModel.findOne({ _id: tokenResult.userId }, { '__v': 0 });
     if(user){
-      userModel.find({},{password:0,__v:0},function (err, data) {
+      userModel.findOne({ _id: tokenResult.userId },{password:0,__v:0},function (err, data) {
         if (err) {
           return res.status(400).json({ status: false, message: "error ocurred please try again" });
         } else{
@@ -117,6 +122,19 @@ router.get('/', async (req, res, next)=> {
 router.get('/:id', async (req, res, next)=> {
 
   let id = req.params.id;
+
+  // if(!id){
+  //   const {authorization} = req.headers;
+  //   let tokenResult;
+  //   try{
+  //     tokenResult = await verifyToken(authorization,secretKey);
+  //   }catch(e){
+  //     return res.status(400).json({ status: false, message: "invalid token" });
+  //   }
+  //   if(authorization){
+  //     id = tokenResult.userId;
+  //   }
+  // }
 
   userModel.findOne({"_id":id},{password:0,__v:0},function (err, data) {
     if (err) {
