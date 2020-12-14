@@ -125,7 +125,15 @@ router.put('/', async (req, res, next)=> {
       let services = [];
         for(let index in req.body.services){
           let servicObj = await servicesModel.findOne({"_id": req.body.services[index]});
-          services.push(servicObj);
+          if(servicObj){
+            services.push(servicObj);
+          }
+        }
+        for(let index in req.body.services){
+          let servicObj = await servicesModel.findOne({"title": req.body.services[index]});
+          if(servicObj){
+            services.push(servicObj);
+          }
         }
         req.body.services = services;
 
