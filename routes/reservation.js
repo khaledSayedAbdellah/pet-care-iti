@@ -133,7 +133,7 @@ router.put('/', async (req, res, next)=> {
 
       insertReservationData.save().
       then((data) => {
-        res.status(200).send({ status: true, message: "sucsess operation" });
+        res.status(200).send({ status: true, message: "success operation" });
       }).catch((err) => {
         res.status(400).send({ status: false, message: err.message });
       });
@@ -168,7 +168,7 @@ router.patch('/', async (req, res, next)=>{
             return res.status(400).json({ status: false, message: "ensure reservationId is valid and rate is valid" });
           }
           else{
-            return res.status(200).json({ status: true, message: "sucsess" })
+            return res.status(200).json({ status: true, message: "success" })
           }
         })
 
@@ -186,7 +186,7 @@ router.patch('/', async (req, res, next)=>{
             return res.status(400).json({ status: false, message: "ensure reservationId is valid and rate is valid" });
           }
           else{
-            return res.status(200).json({ status: true, message: "sucsess" })
+            return res.status(200).json({ status: true, message: "success" })
           }
         })
         //  ><<><><><>><><> database update ><<><><><>><><>
