@@ -123,25 +123,30 @@ router.put('/', async (req, res, next)=> {
       req.body.userId = tokenResult.userId;
       // edit services
       let services = [];
+      let servicObj;
         for(let index in req.body.services){
-          let servicObj = await servicesModel.findOne({"_id": req.body.services[index]});
-          if(servicObj){
-            services.push(servicObj);
+          try{
+            servicObj = await servicesModel.findOne({"_id": req.body.services[index]});
+            if(servicObj){
+              services.push(servicObj);
+            }
+          }catch(err){
+            servicObj = await servicesModel.findOne({"title": req.body.services[index]});
+            if(servicObj){
+              services.push(servicObj);
+            }
+      
           }
+          
         }
-        for(let index in req.body.services){
-          let servicObj = await servicesModel.findOne({"title": req.body.services[index]});
-          if(servicObj){
-            services.push(servicObj);
-          }
-        }
+        
         req.body.services = services;
 
       const insertReservationData = reservationModel(req.body);
 
       insertReservationData.save().
       then((data) => {
-        res.status(200).send({ status: true, message: "success operation" });
+        res.status(200).send({ status: true, message: "success operation",data:  req.body});
       }).catch((err) => {
         res.status(400).send({ status: false, message: err.message });
       });
