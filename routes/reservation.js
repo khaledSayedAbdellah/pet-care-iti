@@ -123,15 +123,15 @@ router.put('/', async (req, res, next)=> {
       req.body.userId = tokenResult.userId;
       // edit services
       let services = [];
-      let servicObj;
+      // let servicObj;
         for(let index in req.body.services){
           try{
-            servicObj = await servicesModel.findOne({"_id": req.body.services[index]});
+            var servicObj = await servicesModel.findOne({"_id": req.body.services[index]});
             if(servicObj){
               services.push(servicObj);
             }
           }catch(err){
-            servicObj = await servicesModel.findOne({"title": req.body.services[index]});
+            var servicObj = await servicesModel.findOne({"title": req.body.services[index]});
             if(servicObj){
               services.push(servicObj);
             }
@@ -141,6 +141,7 @@ router.put('/', async (req, res, next)=> {
         }
         
         req.body.services = services;
+
 
       const insertReservationData = reservationModel(req.body);
 
