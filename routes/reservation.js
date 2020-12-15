@@ -147,7 +147,7 @@ router.put('/', async (req, res, next)=> {
 
       insertReservationData.save().
       then((data) => {
-        res.status(200).send({ status: true, message: "success operation"});
+        res.status(200).send({ status: true, message: "success operation",data: data});
       }).catch((err) => {
         res.status(400).send({ status: false, message: err.message,error: "error" });
       });
