@@ -88,6 +88,34 @@ router.post('/login', async (req, res, next) => {
 });
 
 
+router.patch('/', async (req, res, next)=>{
+  
+  const {authorization} = req.headers;
+  let tokenResult;
+  try{
+    tokenResult = await verifyToken(authorization,secretKey);
+  }catch(e){
+    return res.status(400).json({ status: false, message: "invalid token" });
+  }
+  if(authorization){
+    const userObj = await userModel.findOne({ _id: tokenResult.userId }, { '__v': 0 });
+    if(userObj){
+      userModel.findByIdAndUpdate(tokenResult.userId ,req.body,
+         function(err, result){
+          if(err){
+            return res.status(400).json({ status: false, message: "ensure reservationId is valid and rate is valid" });
+          }
+          else{
+            return res.status(200).json({ status: true, message: "success operation" })
+          }
+        })
+
+    }else{
+      return res.status(400).json({ status: false, message: "ensure that body and token is valid data" });
+    }
+  }
+});
+
 router.get('/', async (req, res, next)=> {
 
   const {authorization} = req.headers;
