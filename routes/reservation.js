@@ -87,7 +87,7 @@ router.get('/', async (req, res, next)=> {
               resultData.push(
                 {
                   user: userObj,
-                  doctor: doctorData,
+                  doctor: data[obj].doctorId,
                   status: data[obj].status,
                   services: data[obj].services,
                   rate: data[obj].rate,
