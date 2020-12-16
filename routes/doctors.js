@@ -202,6 +202,7 @@ router.get('/:id', async (req, res, next)=> {
 
 router.patch('/servicses', async (req, res, next)=>{
   
+  
   const {authorization} = req.headers;
   let tokenResult;
   try{
@@ -214,18 +215,22 @@ router.patch('/servicses', async (req, res, next)=>{
     if(doctorObj){
 
   
-      for(let i=0;i<doctorObj.services.length;i++){
-        if(element._id == req.body.serviceId){
-          if(req.body.status == -1){
+      if(req.body.status == -1){
+        for(let i=0;i<doctorObj.services.length;i++){
+          if(`${doctorObj.services[i]._id}` == req.body.serviceId){        
             doctorObj.services.splice(i, 1);
           }
-
-          if(req.body.status == 1){
-            let addedService = await servicesModel.findOne();
-            doctorObj.services.push(addedService);
-          }
-
         }
+      }
+      
+      if(req.body.status == 1){
+        for(let i=0;i<doctorObj.services.length;i++){
+          if(`${doctorObj.services[i]._id}` == req.body.serviceId){        
+            return res.status(200).json({ status: true, message: "service alredy exist" });;
+          }
+        }
+        let addedService = await servicesModel.findOne({_id: req.body.serviceId});
+        doctorObj.services.push(addedService);
       }
       
       doctorModel.findByIdAndUpdate(tokenResult.userId ,{services: doctorObj.services},
@@ -234,7 +239,7 @@ router.patch('/servicses', async (req, res, next)=>{
             return res.status(400).json({ status: false, message: "ensure reservationId is valid and rate is valid" });
           }
           else{
-            return res.status(200).json({ status: true, message: "success operation" })
+            return res.status(200).json({ status: true, message: "success operation",data: {services: doctorObj.services} })
           }
         })
 
