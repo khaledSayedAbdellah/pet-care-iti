@@ -200,6 +200,49 @@ router.get('/:id', async (req, res, next)=> {
 
 });
 
+router.patch('/servicses', async (req, res, next)=>{
+  
+  const {authorization} = req.headers;
+  let tokenResult;
+  try{
+    tokenResult = await verifyToken(authorization,secretKey);
+  }catch(e){
+    return res.status(400).json({ status: false, message: "invalid token" });
+  }
+  if(authorization){
+    const doctorObj = await doctorModel.findOne({ _id: tokenResult.userId }, { '__v': 0 });
+    if(doctorObj){
+
+  
+      for(let i=0;i<doctorObj.services.length;i++){
+        if(element._id == req.body.serviceId){
+          if(req.body.status == -1){
+            doctorObj.services.splice(i, 1);
+          }
+
+          if(req.body.status == 1){
+            let addedService = await servicesModel.findOne();
+            doctorObj.services.push(addedService);
+          }
+
+        }
+      }
+      
+      doctorModel.findByIdAndUpdate(tokenResult.userId ,{services: doctorObj.services},
+         function(err, result){
+          if(err){
+            return res.status(400).json({ status: false, message: "ensure reservationId is valid and rate is valid" });
+          }
+          else{
+            return res.status(200).json({ status: true, message: "success operation" })
+          }
+        })
+
+    }else{
+      return res.status(400).json({ status: false, message: "ensure that body and token is valid data" });
+    }
+  }
+});
 
 
 module.exports = router;
