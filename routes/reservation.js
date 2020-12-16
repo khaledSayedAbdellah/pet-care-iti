@@ -81,10 +81,12 @@ router.get('/', async (req, res, next)=> {
           let resultData = [];
           for(let obj in data){
             const userObj = await userModel.findOne({ _id: data[obj].userId }, { '_id':0,'password':0,'__v': 0 });
+          
             if(userObj){
               resultData.push(
                 {
                   user: userObj,
+                  doctor: doctorObj,
                   status: data[obj].status,
                   services: data[obj].services,
                   rate: data[obj].rate,
