@@ -8,7 +8,34 @@ const data = mongoose.model('doctors',{
     },
     availabe_dayes: {
         type: Array,
-        default: []
+        'default': [
+            {
+                day: "satarday 19-12-2020",
+                times: [
+                    {
+                        from: "2:30 pm",
+                        to: "4:30 pm"
+                    },
+                    {
+                        from: "8:30 pm",
+                        to: "10:30 pm"
+                    },
+                ]
+            },
+            {
+                day: "sunday 20-12-2020",
+                times: [
+                    {
+                        from: "2:30 pm",
+                        to: "4:30 pm"
+                    },
+                    {
+                        from: "8:30 pm",
+                        to: "10:30 pm"
+                    },
+                ]
+            }
+        ]
     },
     name: {
         type: String,
